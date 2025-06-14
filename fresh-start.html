@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Screenshots Maker - Fresh Start</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #d1d1d6;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .canvas-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        h1 {
+            color: #1d1d1f;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            color: #1d1d1f;
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #86868b;
+            font-size: 15px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: #0056cc;
+        }
+
+        .btn-secondary {
+            background: #f2f2f7;
+            color: #1d1d1f;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8ed;
+        }
+
+        .btn-danger {
+            background: #ff3b30;
+        }
+
+        .btn-danger:hover {
+            background: #d70015;
+        }
+
+        .device-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .device-btn {
+            padding: 12px 8px;
+            border: 2px solid #f2f2f7;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .device-btn.active {
+            border-color: #007aff;
+            background: #f0f8ff;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .color-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .color-swatch:hover {
+            border-color: #007aff;
+        }
+
+        .canvas-info {
+            text-align: center;
+            margin-top: 12px;
+            color: #86868b;
+            font-size: 13px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h1>📱 Screenshots</h1>
+        <p class="subtitle">Create perfect App Store previews</p>
+
+        <div class="section">
+            <h3>📐 Device</h3>
+            <div class="device-selector">
+                <div class="device-btn active" data-device="iphone15pro">
+                    iPhone 15 Pro<br>
+                    <small>1290×2796</small>
+                </div>
+                <div class="device-btn" data-device="iphone15">
+                    iPhone 15<br>
+                    <small>1284×2778</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎨 Background</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: #ffffff; border: 1px solid #ddd;" data-color="#ffffff"></div>
+                <div class="color-swatch" style="background: #000000;" data-color="#000000"></div>
+                <div class="color-swatch" style="background: #007aff;" data-color="#007aff"></div>
+                <div class="color-swatch" style="background: #ff3b30;" data-color="#ff3b30"></div>
+                <div class="color-swatch" style="background: #34c759;" data-color="#34c759"></div>
+                <div class="color-swatch" style="background: #ff9500;" data-color="#ff9500"></div>
+                <div class="color-swatch" style="background: #af52de;" data-color="#af52de"></div>
+                <div class="color-swatch" style="background: #ff2d92;" data-color="#ff2d92"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🛠️ Tools</h3>
+            <button class="btn" id="addTextBtn">📝 Add Text</button>
+            <button class="btn btn-secondary" id="addImageBtn">🖼️ Add Image</button>
+            <button class="btn btn-secondary" id="addRectBtn">▢ Add Rectangle</button>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="section">
+            <h3>💾 Export</h3>
+            <button class="btn" id="exportBtn">📥 Download PNG</button>
+            <button class="btn btn-danger" id="clearBtn">🗑️ Clear All</button>
+        </div>
+    </div>
+
+    <div class="main-area">
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+            <div class="canvas-info" id="canvasInfo">1290 × 2796 pixels</div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let canvas;
+        let currentDevice = 'iphone15pro';
+        
+        // Device configurations
+        const devices = {
+            iphone15pro: { width: 1290, height: 2796, name: 'iPhone 15 Pro' },
+            iphone15: { width: 1284, height: 2778, name: 'iPhone 15' }
+        };
+
+        // Initialize the application
+        function init() {
+            console.log('🚀 Initializing Preview Screenshots Maker...');
+            
+            // Initialize canvas
+            initCanvas();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Set initial background
+            setBackground('#ffffff');
+            
+            console.log('✅ Application initialized successfully!');
+        }
+
+        // Initialize Fabric.js canvas
+        function initCanvas() {
+            const device = devices[currentDevice];
+            
+            canvas = new fabric.Canvas('canvas', {
+                width: device.width,
+                height: device.height,
+                backgroundColor: '#ffffff'
+            });
+
+            // Scale canvas to fit in container
+            scaleCanvas();
+            
+            console.log(`Canvas created: ${device.width}x${device.height}`);
+        }
+
+        // Scale canvas to fit in the container
+        function scaleCanvas() {
+            const device = devices[currentDevice];
+            const container = document.querySelector('.canvas-container');
+            const maxWidth = window.innerWidth - 320; // Account for sidebar
+            const maxHeight = window.innerHeight - 200;
+            
+            const scaleX = maxWidth / device.width;
+            const scaleY = maxHeight / device.height;
+            const scale = Math.min(scaleX, scaleY, 0.6); // Max 60% of original size
+            
+            canvas.setDimensions({
+                width: device.width * scale,
+                height: device.height * scale
+            });
+            
+            canvas.setZoom(scale);
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Device selection
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentDevice = btn.dataset.device;
+                    updateCanvas();
+                });
+            });
+
+            // Background colors
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    const color = swatch.dataset.color;
+                    setBackground(color);
+                });
+            });
+
+            // Tools
+            document.getElementById('addTextBtn').addEventListener('click', addText);
+            document.getElementById('addImageBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            document.getElementById('addRectBtn').addEventListener('click', addRectangle);
+            document.getElementById('fileInput').addEventListener('change', handleImageUpload);
+
+            // Export
+            document.getElementById('exportBtn').addEventListener('click', exportImage);
+            document.getElementById('clearBtn').addEventListener('click', clearCanvas);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboard);
+        }
+
+        // Update canvas when device changes
+        function updateCanvas() {
+            const device = devices[currentDevice];
+            
+            canvas.setDimensions({
+                width: device.width,
+                height: device.height
+            });
+            
+            scaleCanvas();
+            
+            document.getElementById('canvasInfo').textContent = `${device.width} × ${device.height} pixels`;
+            
+            console.log(`Canvas updated to ${device.name}: ${device.width}x${device.height}`);
+        }
+
+        // Set background color
+        function setBackground(color) {
+            canvas.setBackgroundColor(color, canvas.renderAll.bind(canvas));
+            console.log(`Background set to: ${color}`);
+        }
+
+        // Add text to canvas
+        function addText() {
+            const text = new fabric.Text('Your App Name', {
+                left: canvas.width / 2,
+                top: canvas.height * 0.2,
+                fontFamily: 'SF Pro Display, -apple-system, sans-serif',
+                fontSize: 48,
+                fill: '#1d1d1f',
+                textAlign: 'center',
+                originX: 'center',
+                originY: 'center'
+            });
+            
+            canvas.add(text);
+            canvas.setActiveObject(text);
+            canvas.renderAll();
+            
+            console.log('✅ Text added to canvas');
+        }
+
+        // Add rectangle to canvas
+        function addRectangle() {
+            const rect = new fabric.Rect({
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                width: 200,
+                height: 100,
+                fill: '#007aff',
+                originX: 'center',
+                originY: 'center',
+                rx: 12,
+                ry: 12
+            });
+            
+            canvas.add(rect);
+            canvas.setActiveObject(rect);
+            canvas.renderAll();
+            
+            console.log('✅ Rectangle added to canvas');
+        }
+
+        // Handle image upload
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                fabric.Image.fromURL(e.target.result, function(img) {
+                    // Scale image to fit nicely
+                    const maxWidth = canvas.width * 0.8;
+                    const maxHeight = canvas.height * 0.8;
+                    
+                    if (img.width > maxWidth || img.height > maxHeight) {
+                        const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+                        img.scale(scale);
+                    }
+                    
+                    img.set({
+                        left: canvas.width / 2,
+                        top: canvas.height / 2,
+                        originX: 'center',
+                        originY: 'center'
+                    });
+                    
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                    canvas.renderAll();
+                    
+                    console.log('✅ Image added to canvas');
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Export canvas as image
+        function exportImage() {
+            const link = document.createElement('a');
+            link.download = `app-screenshot-${Date.now()}.png`;
+            link.href = canvas.toDataURL({
+                format: 'png',
+                quality: 1,
+                multiplier: 1
+            });
+            link.click();
+            
+            console.log('✅ Image exported');
+        }
+
+        // Clear canvas
+        function clearCanvas() {
+            canvas.clear();
+            setBackground('#ffffff');
+            console.log('🗑️ Canvas cleared');
+        }
+
+        // Handle keyboard shortcuts
+        function handleKeyboard(event) {
+            if (event.key === 'Delete' || event.key === 'Backspace') {
+                const activeObject = canvas.getActiveObject();
+                if (activeObject) {
+                    canvas.remove(activeObject);
+                    canvas.renderAll();
+                }
+            }
+        }
+
+        // Window resize handler
+        window.addEventListener('resize', scaleCanvas);
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

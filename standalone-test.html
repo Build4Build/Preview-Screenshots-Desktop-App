@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Maker - Standalone Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .canvas-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .template-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .status {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>📱 Screenshot Maker</h2>
+        
+        <div class="status">
+            <strong>Status:</strong> <span id="status">Ready</span><br>
+            <strong>Objects:</strong> <span id="objectCount">0</span><br>
+            <strong>Canvas:</strong> <span id="canvasInfo">-</span>
+        </div>
+
+        <div class="section">
+            <h3>📐 Device</h3>
+            <label>
+                <input type="radio" name="device" value="iphone15pro" checked> iPhone 15 Pro
+            </label><br>
+            <label>
+                <input type="radio" name="device" value="iphone15"> iPhone 15
+            </label>
+        </div>
+
+        <div class="section">
+            <h3>📱 Templates</h3>
+            <div class="template-options">
+                <button class="btn btn-secondary" onclick="applyTemplate('hero')">🎯 Hero</button>
+                <button class="btn btn-secondary" onclick="applyTemplate('features')">⚡ Features</button>
+                <button class="btn btn-secondary" onclick="applyTemplate('testimonial')">💬 Testimonial</button>
+                <button class="btn btn-secondary" onclick="applyTemplate('stats')">📊 Stats</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎨 Background</h3>
+            <button class="btn btn-secondary" onclick="setBackground('#667eea')">Blue</button>
+            <button class="btn btn-secondary" onclick="setBackground('#f093fb')">Pink</button>
+            <button class="btn btn-secondary" onclick="setBackground('#4facfe')">Light Blue</button>
+            <button class="btn btn-secondary" onclick="setBackground('#43e97b')">Green</button>
+        </div>
+
+        <div class="section">
+            <h3>📝 Content</h3>
+            <button class="btn btn-primary" onclick="addText()">➕ Add Text</button>
+            <button class="btn btn-primary" onclick="addShape()">⬜ Add Shape</button>
+            <button class="btn btn-primary" onclick="runDebugTest()">🔧 Debug Test</button>
+        </div>
+
+        <div class="section">
+            <h3>💾 Export</h3>
+            <button class="btn btn-primary" onclick="clearCanvas()">🗑️ Clear</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="canvas-container">
+            <canvas id="screenshot-canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let canvas;
+        let currentDevice = 'iphone15pro';
+        const devices = {
+            iphone15pro: { width: 1290, height: 2796, name: 'iPhone 15 Pro (6.9")' },
+            iphone15: { width: 1284, height: 2778, name: 'iPhone 15 (6.5")' }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initCanvas();
+            bindEvents();
+            updateStatus('Canvas initialized');
+        });
+
+        function initCanvas() {
+            const canvasElement = document.getElementById('screenshot-canvas');
+            
+            canvas = new fabric.Canvas(canvasElement, {
+                backgroundColor: '#ffffff',
+                preserveObjectStacking: true,
+                selection: true,
+                renderOnAddRemove: true,
+                enableRetinaScaling: false
+            });
+
+            canvas.on('object:added', updateObjectCount);
+            canvas.on('object:removed', updateObjectCount);
+
+            updateCanvasSize();
+            console.log('Canvas initialized:', canvas.width, 'x', canvas.height);
+        }
+
+        function bindEvents() {
+            document.querySelectorAll('input[name="device"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    currentDevice = e.target.value;
+                    updateCanvasSize();
+                });
+            });
+        }
+
+        function updateCanvasSize() {
+            const device = devices[currentDevice];
+            const scale = Math.min(
+                (window.innerWidth - 350) / device.width,
+                (window.innerHeight - 100) / device.height,
+                0.5
+            );
+
+            canvas.setDimensions({
+                width: device.width,
+                height: device.height
+            });
+
+            canvas.setZoom(scale);
+            canvas.calcOffset();
+            canvas.renderAll();
+
+            document.getElementById('canvasInfo').textContent = `${device.width} × ${device.height} (${(scale * 100).toFixed(0)}%)`;
+            console.log('Canvas updated:', device.width, 'x', device.height, 'scale:', scale);
+        }
+
+        function updateObjectCount() {
+            const count = canvas ? canvas.getObjects().length : 0;
+            document.getElementById('objectCount').textContent = count;
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        function addText() {
+            console.log('Adding text...');
+            updateStatus('Adding text...');
+            
+            const text = new fabric.Text('Your Text Here', {
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                originX: 'center',
+                originY: 'center',
+                fontFamily: 'Arial',
+                fontSize: 64,
+                fill: '#000000',
+                visible: true,
+                selectable: true
+            });
+
+            console.log('Text object created at:', text.left, text.top);
+            
+            canvas.add(text);
+            canvas.setActiveObject(text);
+            canvas.renderAll();
+            
+            updateStatus('Text added');
+            console.log('Total objects:', canvas.getObjects().length);
+        }
+
+        function addShape() {
+            console.log('Adding shape...');
+            updateStatus('Adding shape...');
+            
+            const rect = new fabric.Rect({
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                originX: 'center',
+                originY: 'center',
+                width: 200,
+                height: 200,
+                fill: '#007AFF',
+                rx: 20,
+                ry: 20,
+                visible: true,
+                selectable: true
+            });
+
+            canvas.add(rect);
+            canvas.setActiveObject(rect);
+            canvas.renderAll();
+            
+            updateStatus('Shape added');
+        }
+
+        function setBackground(color) {
+            canvas.setBackgroundColor(color, canvas.renderAll.bind(canvas));
+            updateStatus('Background updated');
+        }
+
+        function clearCanvas() {
+            canvas.clear();
+            canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+            updateStatus('Canvas cleared');
+        }
+
+        function applyTemplate(templateType) {
+            console.log('Applying template:', templateType);
+            updateStatus('Applying ' + templateType + ' template...');
+            
+            const device = devices[currentDevice];
+            
+            switch(templateType) {
+                case 'hero':
+                    createHeroTemplate(device);
+                    break;
+                case 'features':
+                    createFeatureTemplate(device);
+                    break;
+                case 'testimonial':
+                    createTestimonialTemplate(device);
+                    break;
+                case 'stats':
+                    createStatsTemplate(device);
+                    break;
+            }
+        }
+
+        function createHeroTemplate(device) {
+            canvas.clear();
+            canvas.setBackgroundColor('#667eea');
+            
+            const title = new fabric.Text('Your App Name', {
+                left: device.width / 2,
+                top: device.height * 0.15,
+                originX: 'center',
+                originY: 'center',
+                fontSize: 60,
+                fill: '#ffffff',
+                fontFamily: 'Arial'
+            });
+
+            const subtitle = new fabric.Text('Amazing features await', {
+                left: device.width / 2,
+                top: device.height * 0.25,
+                originX: 'center',
+                originY: 'center',
+                fontSize: 32,
+                fill: '#ffffff',
+                fontFamily: 'Arial'
+            });
+
+            const phoneMockup = new fabric.Rect({
+                left: device.width / 2,
+                top: device.height * 0.6,
+                originX: 'center',
+                originY: 'center',
+                width: device.width * 0.25,
+                height: device.height * 0.45,
+                fill: '#ffffff',
+                rx: 20,
+                ry: 20
+            });
+
+            canvas.add(title);
+            canvas.add(subtitle);
+            canvas.add(phoneMockup);
+            canvas.renderAll();
+            
+            updateStatus('Hero template applied');
+        }
+
+        function createFeatureTemplate(device) {
+            canvas.clear();
+            canvas.setBackgroundColor('#f8f9fa');
+
+            const features = [
+                { title: 'Fast & Secure', icon: '🚀' },
+                { title: 'Easy to Use', icon: '✨' },
+                { title: 'Always Updated', icon: '🔄' }
+            ];
+
+            features.forEach((feature, index) => {
+                const yPos = device.height * 0.2 + (index * device.height * 0.25);
+
+                const icon = new fabric.Text(feature.icon, {
+                    left: device.width / 2,
+                    top: yPos,
+                    originX: 'center',
+                    originY: 'center',
+                    fontSize: 80,
+                    fontFamily: 'Arial'
+                });
+
+                const title = new fabric.Text(feature.title, {
+                    left: device.width / 2,
+                    top: yPos + 80,
+                    originX: 'center',
+                    originY: 'center',
+                    fontFamily: 'Arial',
+                    fontSize: 36,
+                    fill: '#1d1d1f'
+                });
+
+                canvas.add(icon);
+                canvas.add(title);
+            });
+
+            canvas.renderAll();
+            updateStatus('Features template applied');
+        }
+
+        function createTestimonialTemplate(device) {
+            canvas.clear();
+            canvas.setBackgroundColor('#ffffff');
+
+            const quote = new fabric.Text('"', {
+                left: device.width / 2,
+                top: device.height * 0.15,
+                originX: 'center',
+                originY: 'center',
+                fontSize: 120,
+                fill: '#007AFF',
+                fontFamily: 'Arial'
+            });
+
+            const testimonial = new fabric.Text('This app changed my\ndaily routine completely!', {
+                left: device.width / 2,
+                top: device.height * 0.4,
+                originX: 'center',
+                originY: 'center',
+                fontFamily: 'Arial',
+                fontSize: 40,
+                fill: '#1d1d1f',
+                textAlign: 'center'
+            });
+
+            const stars = new fabric.Text('⭐⭐⭐⭐⭐', {
+                left: device.width / 2,
+                top: device.height * 0.6,
+                originX: 'center',
+                originY: 'center',
+                fontSize: 40,
+                fontFamily: 'Arial'
+            });
+
+            canvas.add(quote);
+            canvas.add(testimonial);
+            canvas.add(stars);
+            canvas.renderAll();
+            
+            updateStatus('Testimonial template applied');
+        }
+
+        function createStatsTemplate(device) {
+            canvas.clear();
+            canvas.setBackgroundColor('#1d1d1f');
+
+            const title = new fabric.Text('Trusted by millions', {
+                left: device.width / 2,
+                top: device.height * 0.15,
+                originX: 'center',
+                originY: 'center',
+                fontFamily: 'Arial',
+                fontSize: 48,
+                fill: '#ffffff'
+            });
+
+            canvas.add(title);
+
+            const stats = [
+                { number: '1M+', label: 'Downloads' },
+                { number: '4.8★', label: 'Rating' },
+                { number: '150+', label: 'Countries' }
+            ];
+
+            stats.forEach((stat, index) => {
+                const yPos = device.height * 0.35 + (index * device.height * 0.2);
+
+                const number = new fabric.Text(stat.number, {
+                    left: device.width / 2,
+                    top: yPos,
+                    originX: 'center',
+                    originY: 'center',
+                    fontFamily: 'Arial',
+                    fontSize: 80,
+                    fill: '#007AFF'
+                });
+
+                const label = new fabric.Text(stat.label, {
+                    left: device.width / 2,
+                    top: yPos + 80,
+                    originX: 'center',
+                    originY: 'center',
+                    fontFamily: 'Arial',
+                    fontSize: 32,
+                    fill: '#ffffff'
+                });
+
+                canvas.add(number);
+                canvas.add(label);
+            });
+
+            canvas.renderAll();
+            updateStatus('Stats template applied');
+        }
+
+        function runDebugTest() {
+            console.log('=== DEBUG TEST ===');
+            updateStatus('Running debug test...');
+            
+            canvas.clear();
+            canvas.setBackgroundColor('#f0f0f0');
+            
+            // Add large, visible objects at predictable positions
+            const debugRect = new fabric.Rect({
+                left: 200,
+                top: 200,
+                width: 300,
+                height: 300,
+                fill: '#ff0000',
+                stroke: '#000000',
+                strokeWidth: 10,
+                visible: true,
+                selectable: true
+            });
+            
+            const debugText = new fabric.Text('DEBUG TEST', {
+                left: canvas.width / 2,
+                top: 600,
+                originX: 'center',
+                originY: 'center',
+                fontSize: 72,
+                fill: '#000000',
+                fontFamily: 'Arial',
+                visible: true,
+                selectable: true
+            });
+            
+            console.log('Adding debug objects...');
+            console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+            console.log('Canvas zoom:', canvas.getZoom());
+            
+            canvas.add(debugRect);
+            canvas.add(debugText);
+            canvas.renderAll();
+            
+            console.log('Objects added:', canvas.getObjects().length);
+            console.log('Rect bounds:', debugRect.getBoundingRect());
+            console.log('Text bounds:', debugText.getBoundingRect());
+            
+            updateStatus('Debug test completed - check console');
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', updateCanvasSize);
+    </script>
+</body>
+</html>

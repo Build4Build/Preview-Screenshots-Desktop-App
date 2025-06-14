@@ -1,0 +1,45 @@
+{
+  "name": "preview-screenshots-maker",
+  "version": "1.0.0",
+  "description": "Electron app for creating Apple App Store preview screenshots",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "dist": "electron-builder --publish=never"
+  },
+  "keywords": [
+    "electron",
+    "screenshots",
+    "apple",
+    "app-store",
+    "preview"
+  ],
+  "author": "Pierre-Henry Soria",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "fabric": "^5.3.0",
+    "file-saver": "^2.0.5"
+  },
+  "build": {
+    "appId": "com.pierrhenry.preview-screenshots-maker",
+    "productName": "Preview Screenshots Maker",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "target": "dmg"
+    }
+  }
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Screenshots Maker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>📱 Preview Screenshots Maker</h1>
+            <p>Create stunning Apple App Store screenshots</p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="section">
+                    <h3>📐 Device Size</h3>
+                    <div class="device-options">
+                        <label class="radio-option">
+                            <input type="radio" name="device" value="iphone15pro" checked>
+                            <span class="radio-custom"></span>
+                            iPhone 15 Pro (6.9")
+                            <small>1290 × 2796</small>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="device" value="iphone15" >
+                            <span class="radio-custom"></span>
+                            iPhone 15 (6.5")
+                            <small>1284 × 2778</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🎨 Background</h3>
+                    <div class="background-options">
+                        <div class="color-presets">
+                            <div class="color-preset" data-color="#ffffff" style="background: #ffffff;"></div>
+                            <div class="color-preset" data-color="#000000" style="background: #000000;"></div>
+                            <div class="color-preset" data-color="#007AFF" style="background: #007AFF;"></div>
+                            <div class="color-preset" data-color="#FF3B30" style="background: #FF3B30;"></div>
+                            <div class="color-preset" data-color="#34C759" style="background: #34C759;"></div>
+                            <div class="color-preset" data-color="#FF9500" style="background: #FF9500;"></div>
+                            <div class="color-preset" data-color="#AF52DE" style="background: #AF52DE;"></div>
+                            <div class="color-preset" data-color="#FF2D92" style="background: #FF2D92;"></div>
+                        </div>
+                        <div class="gradient-options">
+                            <div class="gradient-preset" data-gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
+                            <div class="gradient-preset" data-gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"></div>
+                            <div class="gradient-preset" data-gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
+                            <div class="gradient-preset" data-gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div>
+                        </div>
+                        <div class="custom-color">
+                            <input type="color" id="customColor" value="#ffffff">
+                            <label for="customColor">Custom Color</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>📱 Templates</h3>
+                    <div class="template-options">
+                        <button class="btn btn-secondary template-btn" data-template="hero">
+                            🎯 Hero
+                        </button>
+                        <button class="btn btn-secondary template-btn" data-template="features">
+                            ⚡ Features
+                        </button>
+                        <button class="btn btn-secondary template-btn" data-template="testimonial">
+                            💬 Testimonial
+                        </button>
+                        <button class="btn btn-secondary template-btn" data-template="stats">
+                            📊 Statistics
+                        </button>
+                        <button class="btn btn-primary" id="debugTest" style="margin-top: 10px; width: 100%;">
+                            🔧 Debug Test
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🖼️ Content</h3>
+                    <div class="content-options">
+                        <button class="btn btn-primary" id="addImage">
+                            📷 Add Image
+                        </button>
+                        <button class="btn btn-secondary" id="addText">
+                            📝 Add Text
+                        </button>
+                        <button class="btn btn-secondary" id="addShape">
+                            🔷 Add Shape
+                        </button>
+                        <button class="btn btn-secondary" id="addFrame">
+                            📱 Add Device Frame
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>💾 Export</h3>
+                    <div class="export-options">
+                        <button class="btn btn-success" id="saveImage">
+                            💾 Save Screenshot
+                        </button>
+                        <div class="export-format">
+                            <label for="format">Format:</label>
+                            <select id="format">
+                                <option value="png">PNG</option>
+                                <option value="jpeg">JPEG</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" id="clearCanvas">
+                            🗑️ Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>⌨️ Shortcuts</h3>
+                    <div class="shortcuts">
+                        <small>
+                            <strong>⌘/Ctrl + S:</strong> Save<br>
+                            <strong>⌘/Ctrl + D:</strong> Duplicate<br>
+                            <strong>Delete:</strong> Remove selected<br>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas-wrapper" id="canvasWrapper">
+                    <canvas id="screenshot-canvas"></canvas>
+                </div>
+                <div class="canvas-info">
+                    <span id="canvasInfo">1290 × 2796 pixels</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="properties-panel" id="propertiesPanel" style="display: none;">
+            <h3>Properties</h3>
+            <div id="propertyControls"></div>
+        </div>
+    </div>
+
+    <!-- Load the clean JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
