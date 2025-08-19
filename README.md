@@ -213,15 +213,19 @@ For better performance:
 2. **Close Other Apps**: Free up system memory
 3. **Use Chrome/Safari**: Some browsers handle canvas better than others
 
+## 👨‍💻 Who is behind this project?
+
+[![Pierre-Henry Soria](https://s.gravatar.com/avatar/a210fe61253c43c869d71eaed0e90149?s=200)](https://PH7.me 'Pierre-Henry Soria personal website')
+
+**Pierre-Henry Soria**. A **super passionate engineer** who loves automating content creation efficiently! 🚀 Enthusiast for YouTube, AI, learning, and writing of course! 😊 Find me at [pH7.me](https://ph7.me) 💫
+
+Are you enjoying this project? If so, you could **[offer me a coffee](https://ko-fi.com/phenry)** (spoiler alert, I **love** extra hot oat flat white 😋)
+
+[![@phenrysay][x-icon]](https://x.com/phenrysay) [![YouTube Tech Videos][youtube-icon]](https://youtu.be/5JA2rq6TFwM "My YouTube Tech Channel") [![pH-7][github-icon]](https://github.com/pH-7) [![BlueSky][bsky-icon]](https://bsky.app/profile/ph7s.bsky.social "Follow Me on BlueSky")
+
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
-
-## 📞 Support
-
-- **Issues**: Create an issue in the GitHub repository
-- **Feature Requests**: Use the repository's issue tracker
-- **Discussions**: Join the community discussions
 
 ## 🙏 Acknowledgments
 
