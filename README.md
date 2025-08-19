@@ -235,3 +235,10 @@ MIT License - see [LICENSE](LICENSE) file for details.
 **Made with ❤️ for the iOS developer community**
 
 *Perfect App Store screenshots, every time.* 📱✨
+
+
+<!-- GitHub's Markdown reference links -->
+[x-icon]: https://img.shields.io/badge/x-000000?style=for-the-badge&logo=x
+[bsky-icon]: https://img.shields.io/badge/BlueSky-00A8E8?style=for-the-badge&logo=bluesky&logoColor=white
+[github-icon]: https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white
+[youtube-icon]: https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white
